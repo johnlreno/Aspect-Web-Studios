@@ -154,6 +154,47 @@ faqItems.forEach((item) => {
   });
 });
 
+// ---------- Barber demo: panel navigation ----------
+function showDemo2Panel(name) {
+  document.querySelectorAll(".demo2-link").forEach((btn) => {
+    btn.classList.toggle("is-active", btn.dataset.panel2 === name);
+  });
+  document.querySelectorAll(".demo2-panel").forEach((panel) => {
+    panel.classList.toggle("is-active", panel.dataset.panel2 === name);
+  });
+}
+
+document.querySelectorAll(".demo2-link").forEach((btn) => {
+  btn.addEventListener("click", () => showDemo2Panel(btn.dataset.panel2));
+});
+
+document.querySelectorAll("[data-goto2]").forEach((btn) => {
+  btn.addEventListener("click", () => showDemo2Panel(btn.dataset.goto2));
+});
+
+// ---------- Barber demo: booking ----------
+const confirmBtn = document.getElementById("demo2-confirm");
+const bookNote = document.getElementById("demo2-note");
+let pickedSlot = null;
+
+document.querySelectorAll(".slot").forEach((slot) => {
+  slot.addEventListener("click", () => {
+    document.querySelectorAll(".slot").forEach((s) => s.classList.remove("is-picked"));
+    slot.classList.add("is-picked");
+    pickedSlot = slot.textContent;
+    confirmBtn.disabled = false;
+    bookNote.textContent = "";
+  });
+});
+
+confirmBtn.addEventListener("click", () => {
+  if (!pickedSlot) return;
+  bookNote.textContent = `Chair held for ${pickedSlot}. See you then. 💈`;
+  confirmBtn.disabled = true;
+  document.querySelectorAll(".slot").forEach((s) => s.classList.remove("is-picked"));
+  pickedSlot = null;
+});
+
 // ---------- Editable placeholder (experiment area) ----------
 document.querySelectorAll("[data-placeholder]").forEach((box) => {
   const text = box.querySelector("p");

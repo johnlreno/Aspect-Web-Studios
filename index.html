@@ -40,7 +40,7 @@
     <!-- ============ HERO ============ -->
     <section class="hero" data-bg="tone-a">
       <h1 class="hero-title">
-        <span class="line"><span class="word">Websites,</span></span>
+        <span class="line"><span class="word">Websites</span></span>
         <span class="line"><span class="word grad">thoughtfully</span></span>
         <span class="line"><span class="word">built.</span></span>
       </h1>
@@ -51,9 +51,6 @@
       <div class="hero-actions reveal">
         <a class="btn btn-primary" href="#contact">Start a project</a>
         <a class="btn btn-ghost" href="#demo">See a live demo ↓</a>
-      </div>
-      <div class="scroll-hint reveal" aria-hidden="true">
-        <span class="scroll-dot"></span>
       </div>
     </section>
 
@@ -86,6 +83,21 @@
         </button>
       </div>
       <p class="stat-note reveal" id="stat-note">Tap a card to learn more.</p>
+
+      <!-- Visual filler: a site assembling itself -->
+      <div class="wireframe reveal" aria-hidden="true">
+        <div class="wf-bar"><span></span><span></span><span></span></div>
+        <div class="wf-body">
+          <div class="wf-hero"></div>
+          <div class="wf-row">
+            <div class="wf-block"></div>
+            <div class="wf-block"></div>
+            <div class="wf-block"></div>
+          </div>
+          <div class="wf-line wf-line-long"></div>
+          <div class="wf-line wf-line-short"></div>
+        </div>
+      </div>
     </section>
 
     <!-- ============ SERVICES ============ -->
@@ -119,8 +131,8 @@
       <div class="steps">
         <div class="step reveal" tabindex="0">
           <span class="step-num">01</span>
-          <h3>Chat</h3>
-          <p>A short call about your business, your customers, and what the site actually needs to do.</p>
+          <h3>Email</h3>
+          <p>It starts with a short email — tell us about your business and what you need. You'll have a reply, with ideas and a quote, within one business day.</p>
         </div>
         <div class="step reveal" tabindex="0">
           <span class="step-num">02</span>
@@ -140,7 +152,7 @@
       <p class="eyebrow reveal">Live demo</p>
       <h2 class="section-title reveal">What your site could feel like.</h2>
       <p class="section-sub reveal">
-        A small example build — fully interactive. Click around.
+        Two example builds, two personalities — both fully interactive. Click around.
       </p>
 
       <!-- Framed demo "browser" containing the pencil site -->
@@ -264,6 +276,76 @@
         </div>
       </div>
       <p class="demo-caption reveal">Demo content is a placeholder — it'll be swapped for a real client example.</p>
+
+      <!-- Second demo: dark, bold barbershop -->
+      <div class="browser browser-dark reveal" role="region" aria-label="Demo website: Iron &amp; Oak Barber Co.">
+        <div class="browser-bar">
+          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+          <span class="browser-url">ironandoak.example</span>
+        </div>
+
+        <div class="demo2">
+          <header class="demo2-nav">
+            <span class="demo2-logo"><span class="pole" aria-hidden="true"></span>IRON &amp; OAK</span>
+            <nav class="demo2-links">
+              <button class="demo2-link is-active" data-panel2="home">Home</button>
+              <button class="demo2-link" data-panel2="services">Services</button>
+              <button class="demo2-link" data-panel2="book">Book</button>
+            </nav>
+          </header>
+
+          <!-- Panel: Home -->
+          <div class="demo2-panel is-active" data-panel2="home">
+            <div class="demo2-hero">
+              <p class="demo2-kicker">Est. 2011 — Downtown</p>
+              <h3>Sharp cuts.<br />Zero fuss.</h3>
+              <p class="demo2-sub">Classic barbering done right. Walk-ins welcome — appointments faster.</p>
+              <button class="demo2-btn" data-goto2="book">Book a chair</button>
+            </div>
+            <div class="demo2-stats">
+              <div><strong>14</strong><span>years open</span></div>
+              <div><strong>6</strong><span>chairs</span></div>
+              <div><strong>40k+</strong><span>cuts given</span></div>
+            </div>
+          </div>
+
+          <!-- Panel: Services -->
+          <div class="demo2-panel" data-panel2="services">
+            <ul class="demo2-menu">
+              <li><span>Classic cut</span><i></i><strong>$30</strong></li>
+              <li><span>Beard trim</span><i></i><strong>$20</strong></li>
+              <li><span>Hot towel shave</span><i></i><strong>$35</strong></li>
+              <li><span>The works — cut, shave, towel</span><i></i><strong>$55</strong></li>
+            </ul>
+            <p class="demo2-menu-note">Cash, card, or a firm handshake and card.</p>
+          </div>
+
+          <!-- Panel: Book -->
+          <div class="demo2-panel" data-panel2="book">
+            <div class="demo2-book">
+              <h4>Pick a time. We'll hold the chair.</h4>
+              <div class="demo2-slots">
+                <button class="slot">Tue 9:30</button>
+                <button class="slot">Tue 14:00</button>
+                <button class="slot">Wed 10:15</button>
+                <button class="slot">Wed 16:30</button>
+                <button class="slot">Fri 11:00</button>
+                <button class="slot">Sat 9:00</button>
+              </div>
+              <button class="demo2-btn" id="demo2-confirm" disabled>Confirm booking</button>
+              <p class="demo2-note" id="demo2-note" aria-live="polite"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="demo-caption reveal">Same studio, different energy — bolder and darker, still clean.</p>
+
+      <!-- Visual filler: one build, every screen -->
+      <div class="devices reveal" aria-hidden="true">
+        <div class="device device-desktop"><span class="device-screen"></span></div>
+        <div class="device device-tablet"><span class="device-screen"></span></div>
+        <div class="device device-phone"><span class="device-screen"></span></div>
+      </div>
     </section>
 
     <!-- ============ ABOUT (experiment area) ============ -->
@@ -276,6 +358,18 @@
           Your story goes here — who you are, why you build, and what clients can expect.
           Click to try editing this block.
         </p>
+      </div>
+
+      <!-- Visual filler: floating toolbox chips -->
+      <div class="chips reveal" aria-hidden="true">
+        <span class="chip">Design</span>
+        <span class="chip">Figma</span>
+        <span class="chip">HTML</span>
+        <span class="chip">CSS</span>
+        <span class="chip">JavaScript</span>
+        <span class="chip">SEO</span>
+        <span class="chip">Hosting</span>
+        <span class="chip">Analytics</span>
       </div>
     </section>
 
