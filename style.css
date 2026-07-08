@@ -207,7 +207,13 @@ main { position: relative; z-index: 1; }
   line-height: 1.04;
 }
 
-.hero-title .line { display: block; overflow: hidden; }
+/* padding + negative margin keep descenders (g, y) visible inside the clip */
+.hero-title .line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
 
 .hero-title .word {
   display: inline-block;
@@ -467,7 +473,7 @@ main { position: relative; z-index: 1; }
 }
 
 .device-tablet .device-island { width: 26px; }
-.device-phone .device-island { width: 20px; }
+.device-phone .device-island { width: 12px; height: 4px; top: 12px; }
 
 /* MacBook: front view, screen open at 90 degrees */
 .device-macbook {
@@ -1108,13 +1114,6 @@ main { position: relative; z-index: 1; }
   font-weight: 600;
   color: var(--accent-3);
   animation: faq-in 0.4s var(--ease);
-}
-
-.demo-caption {
-  text-align: center;
-  margin-top: 18px;
-  font-size: 0.85rem;
-  color: var(--ink-soft);
 }
 
 /* ============ Demo 2: Iron & Oak (dark, bold, clean) ============ */
