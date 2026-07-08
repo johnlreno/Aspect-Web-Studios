@@ -84,19 +84,24 @@
       </div>
       <p class="stat-note reveal" id="stat-note">Tap a card to learn more.</p>
 
-      <!-- Visual filler: a site assembling itself -->
-      <div class="wireframe reveal" aria-hidden="true">
-        <div class="wf-bar"><span></span><span></span><span></span></div>
-        <div class="wf-body">
-          <div class="wf-hero"></div>
-          <div class="wf-row">
-            <div class="wf-block"></div>
-            <div class="wf-block"></div>
-            <div class="wf-block"></div>
-          </div>
-          <div class="wf-line wf-line-long"></div>
-          <div class="wf-line wf-line-short"></div>
-        </div>
+      <!-- Visual filler: growth curve drawing itself -->
+      <div class="growth reveal" aria-hidden="true">
+        <svg viewBox="0 0 600 190" preserveAspectRatio="none" focusable="false">
+          <defs>
+            <linearGradient id="growth-stroke" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#5b6cff" />
+              <stop offset="0.5" stop-color="#b34fe0" />
+              <stop offset="1" stop-color="#ff5f6d" />
+            </linearGradient>
+            <linearGradient id="growth-fill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#5b6cff" stop-opacity="0.16" />
+              <stop offset="1" stop-color="#5b6cff" stop-opacity="0" />
+            </linearGradient>
+          </defs>
+          <path class="growth-area" d="M10,155 C130,148 210,132 300,98 C395,62 480,48 590,24 L590,185 L10,185 Z" fill="url(#growth-fill)" />
+          <path class="growth-line" d="M10,155 C130,148 210,132 300,98 C395,62 480,48 590,24" fill="none" stroke="url(#growth-stroke)" stroke-width="3.5" stroke-linecap="round" />
+          <circle class="growth-dot" cx="590" cy="24" r="6" fill="#ff5f6d" />
+        </svg>
       </div>
     </section>
 
@@ -342,9 +347,12 @@
 
       <!-- Visual filler: one build, every screen -->
       <div class="devices reveal" aria-hidden="true">
-        <div class="device device-desktop"><span class="device-screen"></span></div>
-        <div class="device device-tablet"><span class="device-screen"></span></div>
-        <div class="device device-phone"><span class="device-screen"></span></div>
+        <div class="device-macbook">
+          <div class="mb-screen"><span class="device-screen"></span></div>
+          <div class="mb-base"></div>
+        </div>
+        <div class="device device-tablet"><span class="device-island"></span><span class="device-screen"></span></div>
+        <div class="device device-phone"><span class="device-island"></span><span class="device-screen"></span></div>
       </div>
     </section>
 
@@ -392,7 +400,7 @@
         </details>
         <details>
           <summary>Do you handle hosting and domains?<span class="faq-icon" aria-hidden="true"></span></summary>
-          <p>We can. Either we set everything up under accounts you own, or we manage hosting for you — whichever you prefer. You always keep ownership of your domain.</p>
+          <p>We'll help you get set up. We walk you through choosing and registering a domain in your own name, connect it to your hosting, and make sure everything is live and working — then show you how to manage it going forward. You keep full ownership from day one.</p>
         </details>
       </div>
     </section>

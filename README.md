@@ -23,7 +23,7 @@ python3 -m http.server 8000
 - **Apple-style motion** — hero words rise in, gradient text shimmers, ambient blurred blobs drift, elements reveal on scroll, stat counters animate. Respects `prefers-reduced-motion`.
 - **Interactive bits** — clickable stat cards, a services marquee, hover-lift cards, a process section, a one-at-a-time FAQ accordion, an editable "experiment area" in About (click it), and a demo contact form.
 - **Embedded demo websites** — two framed browser mockups at `#demo`. The first is a light mini-site for a pencil shop ("Graphite & Co.") with its own navigation, shop with badges and ratings, animated cart, click-to-sharpen pencils, a story timeline, and a newsletter signup. The second is a dark, bolder barbershop site ("Iron & Oak") with a spinning barber pole, a price list, and a working booking flow. Swap content later by editing the `.demo-panel` / `.demo2-panel` blocks in `index.html`.
-- **Visual fillers** — an animated wireframe "site assembling itself" under the stats, a floating toolbox chip cloud under About, and a responsive-devices graphic at the end of the demo section.
+- **Visual fillers** — an animated growth curve that draws itself under the stats, a floating toolbox chip cloud under About, and an Apple-style device trio (MacBook, iPad, and iPhone with Dynamic Islands) at the end of the demo section.
 
 ## Editing placeholder areas
 
