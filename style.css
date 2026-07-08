@@ -211,13 +211,17 @@ main { position: relative; z-index: 1; }
 .hero-title .line {
   display: block;
   overflow: hidden;
-  padding-bottom: 0.14em;
-  margin-bottom: -0.14em;
+  padding-bottom: 0.28em;
+  margin-bottom: -0.28em;
 }
 
 .hero-title .word {
   display: inline-block;
-  transform: translateY(110%);
+  /* extend the box below the baseline so background-clip: text
+     paints the g/y descenders instead of leaving them transparent */
+  padding-bottom: 0.28em;
+  margin-bottom: -0.28em;
+  transform: translateY(115%);
   animation: rise 0.9s var(--ease) forwards;
 }
 
@@ -473,7 +477,7 @@ main { position: relative; z-index: 1; }
 }
 
 .device-tablet .device-island { width: 26px; }
-.device-phone .device-island { width: 12px; height: 4px; top: 12px; }
+.device-phone .device-island { width: 9px; height: 4px; top: 12px; }
 
 /* MacBook: front view, screen open at 90 degrees */
 .device-macbook {
