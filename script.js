@@ -15,6 +15,73 @@ const revealObserver = new IntersectionObserver(
 
 document.querySelectorAll(".reveal").forEach((el) => revealObserver.observe(el));
 
+// ---------- Nav section-indicator bubble ----------
+const navPill = document.querySelector(".nav-pill");
+const navLinksWrap = document.querySelector(".nav-links");
+
+// which nav link each section lights up (in-between sections keep the nearest one)
+const sectionToLink = {
+  work: "#work",
+  services: "#services",
+  process: "#services",
+  demo: "#demo",
+  about: "#about",
+  faq: "#about",
+  contact: "#contact",
+};
+
+let pillLink = null;
+let pillTimeouts = [];
+
+function setNavPill(sectionId) {
+  const href = sectionToLink[sectionId];
+
+  if (!href) {
+    // hero / unmapped: tuck the bubble away
+    navPill.classList.remove("is-on", "pill-travel", "pill-arrive");
+    pillLink = null;
+    return;
+  }
+
+  const link = navLinksWrap.querySelector(`a[href="${href}"]`);
+  if (!link || link === pillLink) return;
+
+  const wasVisible = pillLink !== null;
+  pillLink = link;
+  navPill.style.left = `${link.offsetLeft - 11}px`;
+  navPill.style.width = `${link.offsetWidth + 22}px`;
+
+  pillTimeouts.forEach(clearTimeout);
+  pillTimeouts = [];
+  navPill.classList.remove("pill-travel", "pill-arrive");
+
+  if (wasVisible) {
+    // stretch while sliding to the next/previous section's link…
+    void navPill.offsetWidth; // restart animations cleanly
+    navPill.classList.add("pill-travel");
+    pillTimeouts.push(
+      setTimeout(() => {
+        // …then squash-bounce on arrival
+        navPill.classList.remove("pill-travel");
+        navPill.classList.add("pill-arrive");
+      }, 450),
+      setTimeout(() => navPill.classList.remove("pill-arrive"), 1050)
+    );
+  }
+
+  navPill.classList.add("is-on");
+}
+
+// keep the bubble aligned if the window resizes
+window.addEventListener("resize", () => {
+  if (!pillLink) return;
+  navPill.style.transition = "none";
+  navPill.style.left = `${pillLink.offsetLeft - 11}px`;
+  navPill.style.width = `${pillLink.offsetWidth + 22}px`;
+  void navPill.offsetWidth;
+  navPill.style.transition = "";
+});
+
 // ---------- Background tone shifting per section ----------
 const toneObserver = new IntersectionObserver(
   (entries) => {
@@ -22,6 +89,7 @@ const toneObserver = new IntersectionObserver(
       if (entry.isIntersecting) {
         const tone = entry.target.dataset.bg;
         document.body.className = tone;
+        setNavPill(entry.target.id);
       }
     });
   },
