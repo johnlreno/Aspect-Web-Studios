@@ -82,21 +82,36 @@ window.addEventListener("resize", () => {
   navPill.style.transition = "";
 });
 
-// ---------- Background tone shifting per section ----------
-const toneObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        const tone = entry.target.dataset.bg;
-        document.body.className = tone;
-        setNavPill(entry.target.id);
-      }
+// ---------- Background tone + nav bubble, driven by scroll position ----------
+// (scroll-position based rather than IntersectionObserver: thresholds can
+// never fire for sections taller than the viewport)
+const toneSections = Array.from(document.querySelectorAll("[data-bg]"));
+let toneTicking = false;
+
+function updateSectionState() {
+  const marker = window.innerHeight * 0.45;
+  let active = toneSections[0];
+  for (const section of toneSections) {
+    if (section.getBoundingClientRect().top <= marker) active = section;
+  }
+  document.body.className = active.dataset.bg;
+  setNavPill(active.id);
+}
+
+window.addEventListener(
+  "scroll",
+  () => {
+    if (toneTicking) return;
+    toneTicking = true;
+    requestAnimationFrame(() => {
+      updateSectionState();
+      toneTicking = false;
     });
   },
-  { threshold: 0.4 }
+  { passive: true }
 );
 
-document.querySelectorAll("[data-bg]").forEach((el) => toneObserver.observe(el));
+updateSectionState();
 
 // ---------- Animated stat counters ----------
 const easeOut = (t) => 1 - Math.pow(1 - t, 3);

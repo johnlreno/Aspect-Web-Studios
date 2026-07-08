@@ -87,6 +87,7 @@
 
       <!-- Visual filler: growth curve drawing itself -->
       <div class="growth reveal" aria-hidden="true">
+        <div class="growth-chart">
         <svg viewBox="0 0 600 190" preserveAspectRatio="none" focusable="false">
           <defs>
             <linearGradient id="growth-stroke" x1="0" y1="0" x2="1" y2="0">
@@ -101,8 +102,9 @@
           </defs>
           <path class="growth-area" d="M10,155 C130,148 210,132 300,98 C395,62 480,48 590,24 L590,185 L10,185 Z" fill="url(#growth-fill)" />
           <path class="growth-line" d="M10,155 C130,148 210,132 300,98 C395,62 480,48 590,24" fill="none" stroke="url(#growth-stroke)" stroke-width="3.5" stroke-linecap="round" />
-          <circle class="growth-dot" cx="590" cy="24" r="6" fill="#ff5f6d" />
         </svg>
+        <span class="growth-dot"></span>
+        </div>
       </div>
     </section>
 
