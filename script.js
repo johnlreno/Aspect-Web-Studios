@@ -1,5 +1,25 @@
 /* Aspect Web Studios — interactions */
 
+// ---------- Always start at the top on refresh ----------
+// Reloads jump to leftover #hashes from nav clicks, and browsers restore
+// the previous scroll position; disable both.
+if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+
+if (location.hash) {
+  history.replaceState(null, "", location.pathname + location.search);
+}
+window.scrollTo(0, 0);
+
+// Smooth-scroll in-page links ourselves so the URL never gains a #hash
+document.querySelectorAll('a[href^="#"]').forEach((link) => {
+  link.addEventListener("click", (e) => {
+    const target = document.querySelector(link.getAttribute("href"));
+    if (!target) return;
+    e.preventDefault();
+    target.scrollIntoView({ behavior: "smooth" });
+  });
+});
+
 // ---------- Scroll reveal ----------
 const revealObserver = new IntersectionObserver(
   (entries) => {
