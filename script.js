@@ -357,37 +357,5 @@ document.querySelectorAll("[data-placeholder]").forEach((box) => {
   });
 });
 
-// ---------- Contact form ----------
-const form = document.getElementById("contact-form");
-const formNote = document.getElementById("form-note");
-
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const name = form.name.value.trim() || "there";
-  const submitBtn = form.querySelector("button[type='submit']");
-
-  submitBtn.disabled = true;
-  formNote.textContent = "Sending...";
-
-  try {
-    const response = await fetch(form.action, {
-      method: "POST",
-      body: new FormData(form),
-      headers: { Accept: "application/json" },
-    });
-
-    if (response.ok) {
-      formNote.textContent = `Thanks, ${name}! We'll be in touch soon.`;
-      form.reset();
-    } else {
-      formNote.textContent = "Something went wrong — please email us directly.";
-    }
-  } catch {
-    formNote.textContent = "Something went wrong — please email us directly.";
-  }
-
-  submitBtn.disabled = false;
-});
-
 // ---------- Footer year ----------
 document.getElementById("year").textContent = new Date().getFullYear();

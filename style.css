@@ -1492,7 +1492,15 @@ main { position: relative; z-index: 1; }
   box-shadow: 0 0 0 4px rgba(91, 108, 255, 0.12);
 }
 
+.field input[aria-invalid="true"], .field textarea[aria-invalid="true"] {
+  border-color: var(--accent-2);
+}
+
+.field-error { font-size: 0.8rem; color: var(--accent-2); font-weight: 600; min-height: 1.2em; }
+
 .form-note { margin-top: 14px; font-size: 0.9rem; color: var(--accent-3); font-weight: 600; min-height: 1.4em; }
+
+.form-note-error { color: var(--accent-2); }
 
 /* ============ Footer ============ */
 .footer {

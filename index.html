@@ -412,19 +412,22 @@
         <div class="field-row">
           <label class="field">
             <span>Name</span>
-            <input type="text" name="name" placeholder="Jane Appleseed" required />
+            <input type="text" name="name" placeholder="Jane Appleseed" data-fs-field required />
           </label>
           <label class="field">
             <span>Email</span>
-            <input type="email" name="email" placeholder="jane@business.com" required />
+            <input type="email" name="email" placeholder="jane@business.com" data-fs-field required />
+            <span class="field-error" data-fs-error="email"></span>
           </label>
         </div>
         <label class="field">
           <span>Tell us about your project</span>
-          <textarea name="message" rows="4" placeholder="I run a small bakery and need a site that…"></textarea>
+          <textarea name="message" rows="4" placeholder="I run a small bakery and need a site that…" data-fs-field></textarea>
+          <span class="field-error" data-fs-error="message"></span>
         </label>
-        <button class="btn btn-primary" type="submit">Send message</button>
-        <p class="form-note" id="form-note" aria-live="polite"></p>
+        <button class="btn btn-primary" type="submit" data-fs-submit-btn>Send message</button>
+        <p class="form-note" data-fs-success aria-live="polite"></p>
+        <p class="form-note form-note-error" data-fs-error aria-live="polite"></p>
       </form>
     </section>
 
@@ -436,5 +439,10 @@
   </footer>
 
   <script src="script.js"></script>
+  <script>
+    window.formspree = window.formspree || function () { (formspree.q = formspree.q || []).push(arguments); };
+    formspree('initForm', { formElement: '#contact-form', formId: 'xrewwppv' });
+  </script>
+  <script src="https://unpkg.com/@formspree/ajax@1" defer></script>
 </body>
 </html>
