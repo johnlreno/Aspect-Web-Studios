@@ -365,6 +365,11 @@ const themeToggle = document.getElementById("theme-toggle");
 const themeMeta = document.querySelector('meta[name="theme-color"]');
 const rootEl = document.documentElement;
 
+// Source of truth for the intended theme. Tracked separately because the
+// animated swap lands late (after the wipe/transition), so reading the DOM
+// attribute mid-animation would give a stale value if the user toggles fast.
+let currentTheme = rootEl.getAttribute("data-theme") === "dark" ? "dark" : "light";
+
 function applyTheme(theme) {
   if (theme === "dark") rootEl.setAttribute("data-theme", "dark");
   else rootEl.removeAttribute("data-theme");
@@ -373,30 +378,72 @@ function applyTheme(theme) {
   if (themeMeta) themeMeta.content = theme === "dark" ? "#131316" : "#f6f6f7";
 }
 
+// Touch devices choke on the View Transitions snapshot; give them the
+// lightweight circle wipe below instead
+const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
+
+function radiusFrom(origin) {
+  const ox = origin ? origin.x : window.innerWidth - 38;
+  const oy = origin ? origin.y : 36;
+  return {
+    x: ox,
+    y: oy,
+    r: Math.hypot(Math.max(ox, window.innerWidth - ox), Math.max(oy, window.innerHeight - oy)),
+  };
+}
+
+// Cheap, always-smooth transition: a single solid overlay wipes across as
+// an expanding circle, we swap the theme while it fully covers the screen
+// (no color pop), then fade the overlay away to reveal the new page. Only
+// clip-path and opacity animate — both run on the compositor, so it stays
+// fluid on phones where the View Transitions snapshot stutters.
+function circleWipe(theme, origin) {
+  const o = radiusFrom(origin);
+  const overlay = document.createElement("div");
+  overlay.className = "theme-wipe";
+  overlay.style.background = theme === "dark" ? "#131316" : "#f6f6f7";
+  document.body.appendChild(overlay);
+
+  const grow = overlay.animate(
+    {
+      clipPath: [`circle(0px at ${o.x}px ${o.y}px)`, `circle(${o.r}px at ${o.x}px ${o.y}px)`],
+    },
+    { duration: 430, easing: "cubic-bezier(0.4, 0, 0.2, 1)", fill: "forwards" }
+  );
+
+  grow.onfinish = () => {
+    // Screen is fully covered — swap instantly (theme-snap kills the body's
+    // 1.1s background transition so nothing eases underneath the cover)
+    rootEl.classList.add("theme-snap");
+    applyTheme(theme);
+    requestAnimationFrame(() => rootEl.classList.remove("theme-snap"));
+
+    const fade = overlay.animate(
+      { opacity: [1, 0] },
+      { duration: 340, easing: "ease", fill: "forwards" }
+    );
+    fade.onfinish = () => overlay.remove();
+  };
+}
+
 function switchTheme(theme, origin) {
   if (reducedMotion) {
     applyTheme(theme);
     return;
   }
 
-  // Preferred: the new theme sweeps across the page as a circle
-  // growing out of the toggle (View Transitions API)
-  if (document.startViewTransition && origin) {
+  // Desktop: the new theme sweeps in as a circle revealing the fully-formed
+  // page (View Transitions API)
+  if (!coarsePointer && document.startViewTransition && origin) {
     rootEl.classList.add("theme-snap");
     const vt = document.startViewTransition(() => applyTheme(theme));
     vt.ready
       .then(() => {
         rootEl.classList.remove("theme-snap");
-        const radius = Math.hypot(
-          Math.max(origin.x, window.innerWidth - origin.x),
-          Math.max(origin.y, window.innerHeight - origin.y)
-        );
+        const o = radiusFrom(origin);
         rootEl.animate(
           {
-            clipPath: [
-              `circle(0px at ${origin.x}px ${origin.y}px)`,
-              `circle(${radius}px at ${origin.x}px ${origin.y}px)`,
-            ],
+            clipPath: [`circle(0px at ${o.x}px ${o.y}px)`, `circle(${o.r}px at ${o.x}px ${o.y}px)`],
           },
           {
             duration: 700,
@@ -405,21 +452,23 @@ function switchTheme(theme, origin) {
           }
         );
       })
-      .catch(() => rootEl.classList.remove("theme-snap"));
+      .catch(() => {
+        rootEl.classList.remove("theme-snap");
+        applyTheme(theme);
+      });
     return;
   }
 
-  // Fallback: one soft cross-fade of every color on the page
-  rootEl.classList.add("theme-fading");
-  applyTheme(theme);
-  setTimeout(() => rootEl.classList.remove("theme-fading"), 650);
+  // Phones, tablets, and browsers without View Transitions
+  circleWipe(theme, origin);
 }
 
 // Sync button state with the theme the head script picked before paint
-applyTheme(rootEl.getAttribute("data-theme") === "dark" ? "dark" : "light");
+applyTheme(currentTheme);
 
 themeToggle.addEventListener("click", () => {
-  const next = rootEl.getAttribute("data-theme") === "dark" ? "light" : "dark";
+  const next = currentTheme === "dark" ? "light" : "dark";
+  currentTheme = next;
   try {
     localStorage.setItem("aws-theme", next);
   } catch (e) {}
@@ -432,5 +481,6 @@ window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e)
   try {
     if (localStorage.getItem("aws-theme")) return;
   } catch (err) {}
-  switchTheme(e.matches ? "dark" : "light", null);
+  currentTheme = e.matches ? "dark" : "light";
+  switchTheme(currentTheme, null);
 });

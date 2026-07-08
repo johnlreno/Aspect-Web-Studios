@@ -1664,23 +1664,21 @@ main { position: relative; z-index: 1; }
 ::view-transition-old(root) { z-index: 1; }
 ::view-transition-new(root) { z-index: 9999; }
 
-/* Fallback for browsers without View Transitions: one soft cross-fade */
-html.theme-fading,
-html.theme-fading body,
-html.theme-fading *,
-html.theme-fading *::before,
-html.theme-fading *::after {
-  transition:
-    background-color 0.6s ease,
-    color 0.6s ease,
-    border-color 0.6s ease,
-    box-shadow 0.6s ease,
-    fill 0.6s ease,
-    stroke 0.6s ease !important;
+/* Phones / tablets / no-View-Transitions: a solid overlay wipes across as an
+   expanding circle, then fades to reveal the swapped page. Only clip-path and
+   opacity animate here — both stay on the compositor, so it's smooth on iOS
+   where snapshotting the whole page stutters. */
+.theme-wipe {
+  position: fixed;
+  inset: 0;
+  z-index: 70;              /* above the nav (50) and toggle (60) */
+  pointer-events: none;
+  will-change: clip-path, opacity;
 }
 
-/* While View Transitions captures its snapshot, colors must land instantly —
-   otherwise the reveal would show a half-transitioned frame */
+/* While the swap happens (View Transitions snapshot, or under the wipe's full
+   cover), colors must land instantly — otherwise a half-transitioned frame
+   would show */
 html.theme-snap body,
 html.theme-snap *,
 html.theme-snap *::before,
