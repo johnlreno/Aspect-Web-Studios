@@ -359,3 +359,78 @@ document.querySelectorAll("[data-placeholder]").forEach((box) => {
 
 // ---------- Footer year ----------
 document.getElementById("year").textContent = new Date().getFullYear();
+
+// ---------- Theme (light / dark) ----------
+const themeToggle = document.getElementById("theme-toggle");
+const themeMeta = document.querySelector('meta[name="theme-color"]');
+const rootEl = document.documentElement;
+
+function applyTheme(theme) {
+  if (theme === "dark") rootEl.setAttribute("data-theme", "dark");
+  else rootEl.removeAttribute("data-theme");
+  themeToggle.setAttribute("aria-checked", theme === "dark" ? "true" : "false");
+  themeToggle.setAttribute("aria-label", theme === "dark" ? "Switch to light mode" : "Switch to dark mode");
+  if (themeMeta) themeMeta.content = theme === "dark" ? "#131316" : "#f6f6f7";
+}
+
+function switchTheme(theme, origin) {
+  if (reducedMotion) {
+    applyTheme(theme);
+    return;
+  }
+
+  // Preferred: the new theme sweeps across the page as a circle
+  // growing out of the toggle (View Transitions API)
+  if (document.startViewTransition && origin) {
+    rootEl.classList.add("theme-snap");
+    const vt = document.startViewTransition(() => applyTheme(theme));
+    vt.ready
+      .then(() => {
+        rootEl.classList.remove("theme-snap");
+        const radius = Math.hypot(
+          Math.max(origin.x, window.innerWidth - origin.x),
+          Math.max(origin.y, window.innerHeight - origin.y)
+        );
+        rootEl.animate(
+          {
+            clipPath: [
+              `circle(0px at ${origin.x}px ${origin.y}px)`,
+              `circle(${radius}px at ${origin.x}px ${origin.y}px)`,
+            ],
+          },
+          {
+            duration: 700,
+            easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+            pseudoElement: "::view-transition-new(root)",
+          }
+        );
+      })
+      .catch(() => rootEl.classList.remove("theme-snap"));
+    return;
+  }
+
+  // Fallback: one soft cross-fade of every color on the page
+  rootEl.classList.add("theme-fading");
+  applyTheme(theme);
+  setTimeout(() => rootEl.classList.remove("theme-fading"), 650);
+}
+
+// Sync button state with the theme the head script picked before paint
+applyTheme(rootEl.getAttribute("data-theme") === "dark" ? "dark" : "light");
+
+themeToggle.addEventListener("click", () => {
+  const next = rootEl.getAttribute("data-theme") === "dark" ? "light" : "dark";
+  try {
+    localStorage.setItem("aws-theme", next);
+  } catch (e) {}
+  const rect = themeToggle.getBoundingClientRect();
+  switchTheme(next, { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+});
+
+// Follow live device-theme changes unless the visitor chose one manually
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
+  try {
+    if (localStorage.getItem("aws-theme")) return;
+  } catch (err) {}
+  switchTheme(e.matches ? "dark" : "light", null);
+});
