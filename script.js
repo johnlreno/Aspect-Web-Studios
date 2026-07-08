@@ -1,14 +1,59 @@
 /* Aspect Web Studios — interactions */
 
-// ---------- Always start at the top on refresh ----------
+// ---------- Start at the top on refresh, with a sweep-up effect ----------
 // Reloads jump to leftover #hashes from nav clicks, and browsers restore
-// the previous scroll position; disable both.
+// the previous scroll position; take over both. Instead of snapping to the
+// top, resume where the visitor left off and glide up to the hero.
 if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 
 if (location.hash) {
   history.replaceState(null, "", location.pathname + location.search);
 }
-window.scrollTo(0, 0);
+
+window.addEventListener("pagehide", () => {
+  sessionStorage.setItem("aspect-scroll", String(window.scrollY));
+});
+
+const savedScroll = parseFloat(sessionStorage.getItem("aspect-scroll")) || 0;
+sessionStorage.removeItem("aspect-scroll");
+const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+if (savedScroll > 1 && !reducedMotion) {
+  // resume the previous position instantly (bypassing CSS smooth scrolling)…
+  const rootStyle = document.documentElement.style;
+  rootStyle.scrollBehavior = "auto";
+  window.scrollTo(0, savedScroll);
+
+  // …but hand control back the moment the visitor scrolls themselves
+  let sweepCancelled = false;
+  const cancelSweep = () => (sweepCancelled = true);
+  ["wheel", "touchstart", "keydown"].forEach((ev) =>
+    window.addEventListener(ev, cancelSweep, { once: true, passive: true })
+  );
+
+  setTimeout(() => {
+    const from = window.scrollY;
+    const duration = Math.min(1300, 550 + from * 0.12);
+    const start = performance.now();
+
+    (function sweep(now) {
+      if (sweepCancelled) {
+        rootStyle.scrollBehavior = "";
+        return;
+      }
+      const t = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - t, 3); // ease-out: quick launch, soft landing
+      window.scrollTo(0, from * (1 - eased));
+      if (t < 1) {
+        requestAnimationFrame(sweep);
+      } else {
+        rootStyle.scrollBehavior = "";
+      }
+    })(performance.now());
+  }, 180);
+} else {
+  window.scrollTo(0, 0);
+}
 
 // Smooth-scroll in-page links ourselves so the URL never gains a #hash
 document.querySelectorAll('a[href^="#"]').forEach((link) => {
