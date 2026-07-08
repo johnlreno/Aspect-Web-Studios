@@ -459,6 +459,105 @@ main { position: relative; z-index: 1; }
 
 @keyframes pulse-dot { 0%, 100% { transform: scale(0.7); opacity: 0.5; } 50% { transform: scale(1.25); opacity: 1; } }
 
+/* ============ Process steps ============ */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  counter-reset: step;
+}
+
+.step {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  outline: none;
+  transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease);
+}
+
+.step:hover, .step:focus-visible {
+  transform: translateY(-5px);
+  box-shadow: 0 18px 40px rgba(28, 28, 30, 0.09);
+}
+
+.step-num {
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.step h3 { font-size: 1.15rem; font-weight: 700; margin: 12px 0 8px; letter-spacing: -0.01em; }
+
+.step p { color: var(--ink-soft); font-size: 0.93rem; }
+
+/* ============ FAQ ============ */
+.faq { display: flex; flex-direction: column; gap: 10px; }
+
+.faq details {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: border-color 0.3s ease;
+}
+
+.faq details[open] { border-color: rgba(91, 108, 255, 0.4); }
+
+.faq summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 22px;
+  font-weight: 600;
+  font-size: 0.98rem;
+  cursor: pointer;
+  list-style: none;
+  transition: color 0.25s ease;
+}
+
+.faq summary::-webkit-details-marker { display: none; }
+
+.faq summary:hover { color: var(--accent-1); }
+
+.faq-icon {
+  position: relative;
+  flex: 0 0 14px;
+  height: 14px;
+  transition: transform 0.35s var(--ease);
+}
+
+.faq-icon::before, .faq-icon::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  background: var(--ink-soft);
+  border-radius: 2px;
+}
+
+.faq-icon::before { width: 14px; height: 2px; }
+.faq-icon::after { width: 2px; height: 14px; }
+
+.faq details[open] .faq-icon { transform: rotate(135deg); }
+
+.faq details p {
+  padding: 0 22px 20px;
+  color: var(--ink-soft);
+  font-size: 0.93rem;
+  animation: faq-in 0.4s var(--ease);
+}
+
+@keyframes faq-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 /* ============ Demo browser ============ */
 .browser {
   border-radius: var(--radius);
@@ -494,6 +593,22 @@ main { position: relative; z-index: 1; }
 
 /* --- The pencil demo site --- */
 .demo { background: #fffdf7; min-height: 380px; }
+
+.demo-banner {
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 8px 14px;
+  color: #3a2c00;
+  background: linear-gradient(100deg, #ffe9c0, #ffd98f, #ffe9c0);
+  background-size: 200% 100%;
+  animation: banner-shine 5s ease-in-out infinite;
+}
+
+@keyframes banner-shine {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
 
 .demo-nav {
   display: flex;
@@ -568,8 +683,63 @@ main { position: relative; z-index: 1; }
 
 .demo-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(255, 176, 31, 0.4); }
 
+/* Demo home: features + quote */
+.demo-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 14px;
+  padding: 6px 40px 10px;
+}
+
+.demo-feature {
+  background: #fff;
+  border: 1px solid rgba(28, 28, 30, 0.07);
+  border-radius: 14px;
+  padding: 16px;
+  text-align: center;
+  transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
+}
+
+.demo-feature:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(28, 28, 30, 0.07); }
+
+.demo-feature span { font-size: 1.4rem; }
+
+.demo-feature h5 { font-size: 0.88rem; font-weight: 700; margin: 8px 0 3px; }
+
+.demo-feature p { font-size: 0.8rem; color: var(--ink-soft); }
+
+.demo-quote {
+  text-align: center;
+  font-size: 1.02rem;
+  font-weight: 500;
+  font-style: italic;
+  color: var(--ink);
+  max-width: 420px;
+  margin: 18px auto 0;
+  padding: 0 30px 40px;
+}
+
+.demo-quote cite {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.82rem;
+  font-style: normal;
+  color: var(--ink-soft);
+}
+
 /* CSS pencils */
 .demo-hero-art { display: flex; gap: 18px; padding-right: 10px; }
+
+.demo-hero-art .pencil { cursor: pointer; }
+
+.pencil.is-sharpening { animation: sharpen 0.7s var(--ease); }
+
+@keyframes sharpen {
+  0%   { transform: translateY(0) rotate(0deg); }
+  30%  { transform: translateY(-20px) rotate(360deg) scale(1.08); }
+  60%  { transform: translateY(4px) rotate(360deg) scale(0.96); }
+  100% { transform: translateY(0) rotate(360deg); }
+}
 
 .pencil {
   display: flex;
@@ -617,6 +787,7 @@ main { position: relative; z-index: 1; }
 }
 
 .demo-product {
+  position: relative;
   border: 1px solid rgba(28, 28, 30, 0.08);
   border-radius: 16px;
   padding: 16px;
@@ -624,6 +795,32 @@ main { position: relative; z-index: 1; }
   background: #fff;
   transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
 }
+
+.demo-badge {
+  position: absolute;
+  top: 10px; left: 10px;
+  z-index: 1;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: var(--accent-4);
+  color: #3a2c00;
+}
+
+.badge-new { background: var(--accent-3); color: #fff; }
+
+.demo-stars {
+  display: block;
+  color: var(--accent-4);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  margin-top: 2px;
+}
+
+.star-dim { color: rgba(28, 28, 30, 0.18); }
 
 .demo-product:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(28, 28, 30, 0.08); }
 
@@ -662,6 +859,14 @@ main { position: relative; z-index: 1; }
 
 .demo-cart { text-align: center; padding: 18px 0 28px; font-size: 0.9rem; color: var(--ink-soft); }
 
+.demo-cart.is-bumped { animation: cart-bump 0.45s var(--ease); }
+
+@keyframes cart-bump {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.18); color: var(--ink); }
+  100% { transform: scale(1); }
+}
+
 /* Demo story */
 .demo-story { max-width: 460px; margin: 0 auto; padding: 56px 30px; text-align: center; }
 
@@ -670,6 +875,88 @@ main { position: relative; z-index: 1; }
 .demo-story p { color: var(--ink-soft); font-size: 0.95rem; }
 
 .demo-story-note { margin-top: 16px; font-style: italic; }
+
+.demo-timeline {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+  margin-top: 34px;
+  text-align: center;
+}
+
+.demo-milestone {
+  padding: 16px 12px;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid rgba(28, 28, 30, 0.07);
+  transition: transform 0.3s var(--ease), border-color 0.3s ease;
+}
+
+.demo-milestone:hover { transform: translateY(-3px); border-color: rgba(255, 176, 31, 0.6); }
+
+.demo-milestone span {
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: -0.02em;
+  color: var(--accent-4);
+}
+
+.demo-milestone p { font-size: 0.78rem; color: var(--ink-soft); margin-top: 4px; }
+
+/* Demo footer + newsletter */
+.demo-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 16px 26px;
+  border-top: 1px solid rgba(28, 28, 30, 0.07);
+  background: #fff;
+}
+
+.demo-footer-copy { font-size: 0.8rem; color: var(--ink-soft); }
+
+.demo-news { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.demo-news input {
+  font-family: inherit;
+  font-size: 0.82rem;
+  padding: 9px 14px;
+  border: 1px solid rgba(28, 28, 30, 0.14);
+  border-radius: 999px;
+  background: #fffdf7;
+  min-width: 180px;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.demo-news input:focus {
+  outline: none;
+  border-color: var(--accent-4);
+  box-shadow: 0 0 0 4px rgba(255, 176, 31, 0.16);
+}
+
+.demo-news button {
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 9px 16px;
+  border: none;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.25s var(--ease), background 0.25s ease;
+}
+
+.demo-news button:hover { transform: translateY(-1px); background: #333; }
+
+.demo-news .demo-news-done {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent-3);
+  animation: faq-in 0.4s var(--ease);
+}
 
 .demo-caption {
   text-align: center;

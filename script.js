@@ -63,7 +63,7 @@ document.querySelectorAll(".stat-num").forEach((el) => statObserver.observe(el))
 // ---------- Stat cards: tap to learn more ----------
 const statNotes = {
   1: "Most projects go from first call to launch in about two weeks.",
-  2: "Every site is designed and coded from scratch for your brand.",
+  2: "Fast sites rank higher and convert better — every build is tuned for speed.",
   3: "You work directly with the person building your site — no handoffs.",
 };
 
@@ -102,11 +102,15 @@ document.querySelectorAll("[data-goto]").forEach((btn) => {
 // ---------- Pencil demo: cart ----------
 let cartCount = 0;
 const cartEl = document.getElementById("demo-cart-count");
+const cartLine = document.getElementById("demo-cart");
 
 document.querySelectorAll(".demo-add").forEach((btn) => {
   btn.addEventListener("click", () => {
     cartCount += 1;
     cartEl.textContent = cartCount;
+    cartLine.classList.remove("is-bumped");
+    void cartLine.offsetWidth; // restart the bump animation
+    cartLine.classList.add("is-bumped");
     const original = btn.textContent;
     btn.textContent = "Added ✓";
     btn.disabled = true;
@@ -114,6 +118,39 @@ document.querySelectorAll(".demo-add").forEach((btn) => {
       btn.textContent = original;
       btn.disabled = false;
     }, 900);
+  });
+});
+
+// ---------- Pencil demo: click a pencil to sharpen it ----------
+document.querySelectorAll(".demo-hero-art .pencil").forEach((pencil) => {
+  pencil.addEventListener("click", () => {
+    pencil.classList.add("is-sharpening");
+    pencil.addEventListener(
+      "animationend",
+      () => pencil.classList.remove("is-sharpening"),
+      { once: true }
+    );
+  });
+});
+
+// ---------- Pencil demo: newsletter signup ----------
+const newsForm = document.getElementById("demo-news");
+
+newsForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  newsForm.innerHTML = '<span class="demo-news-done">You\'re in! 📬 Welcome to the pencil club.</span>';
+});
+
+// ---------- FAQ: only one open at a time ----------
+const faqItems = document.querySelectorAll(".faq details");
+
+faqItems.forEach((item) => {
+  item.addEventListener("toggle", () => {
+    if (item.open) {
+      faqItems.forEach((other) => {
+        if (other !== item) other.open = false;
+      });
+    }
   });
 });
 
