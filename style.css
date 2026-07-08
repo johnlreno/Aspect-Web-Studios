@@ -165,6 +165,13 @@ body.tone-e { background-color: var(--tone-e); }
   100%      { transform: rotate(360deg); border-radius: 4px; }
 }
 
+.nav-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--line);
+  flex-shrink: 0;
+}
+
 .nav-links {
   position: relative;
   display: flex;
@@ -223,6 +230,7 @@ body.tone-e { background-color: var(--tone-e); }
 
 @media (max-width: 640px) {
   .nav-pill { display: none; }
+  .nav-divider { display: none; }
 }
 
 .nav-links a:hover { color: var(--ink); }
