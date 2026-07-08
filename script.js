@@ -357,15 +357,36 @@ document.querySelectorAll("[data-placeholder]").forEach((box) => {
   });
 });
 
-// ---------- Demo contact form ----------
+// ---------- Contact form ----------
 const form = document.getElementById("contact-form");
 const formNote = document.getElementById("form-note");
 
-form.addEventListener("submit", (e) => {
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
   const name = form.name.value.trim() || "there";
-  formNote.textContent = `Thanks, ${name}! This is a demo form — hook it up to your inbox later.`;
-  form.reset();
+  const submitBtn = form.querySelector("button[type='submit']");
+
+  submitBtn.disabled = true;
+  formNote.textContent = "Sending...";
+
+  try {
+    const response = await fetch(form.action, {
+      method: "POST",
+      body: new FormData(form),
+      headers: { Accept: "application/json" },
+    });
+
+    if (response.ok) {
+      formNote.textContent = `Thanks, ${name}! We'll be in touch soon.`;
+      form.reset();
+    } else {
+      formNote.textContent = "Something went wrong — please email us directly.";
+    }
+  } catch {
+    formNote.textContent = "Something went wrong — please email us directly.";
+  }
+
+  submitBtn.disabled = false;
 });
 
 // ---------- Footer year ----------
