@@ -487,31 +487,52 @@ function radiusFrom(origin) {
   };
 }
 
-// Fallback for browsers without the View Transitions API: the theme snaps in
-// a single frame (rather than letting every element's own color transition
-// ease independently, which passes through a muddy, low-contrast blend where
-// text and background both sit mid-grey) while a soft brand-colored glow
-// blooms outward from the toggle behind the page content for the visual
-// flourish. The glow never covers content — z-index 0, same layer as the
-// ambient blobs — so nothing on the page is ever blocked.
-function circleWipe(theme, origin) {
+// Phones (and browsers without View Transitions): the snapshot-based circle
+// reveal animates at a low frame rate on iOS, so it moved like stop motion.
+// Instead, the text and UI snap to the new theme in a single frame while the
+// new background color floods outward from the toggle as a clip-path circle
+// on a plain solid layer behind the content (z-index 0, under main/nav) —
+// clipping a solid div is compositor-only work, so it stays at full frame
+// rate, and nothing on screen is ever covered.
+function backgroundFlood(theme, origin) {
+  // fast repeat-toggles: clear any flood still in flight
+  document.querySelectorAll(".theme-fill").forEach((el) => el.remove());
+
   const o = radiusFrom(origin);
-  const overlay = document.createElement("div");
-  overlay.className = "theme-wipe";
-  overlay.style.left = `${o.x}px`;
-  overlay.style.top = `${o.y}px`;
-  document.body.appendChild(overlay);
+  const oldBg = getComputedStyle(document.body).backgroundColor;
+
+  // full-screen layer holding the old background color…
+  const keeper = document.createElement("div");
+  keeper.className = "theme-fill";
+  keeper.style.background = oldBg;
+
+  // …with the new color flooding over it as a growing circle
+  const flood = document.createElement("div");
+  flood.className = "theme-fill";
+
+  document.body.append(keeper, flood);
 
   rootEl.classList.add("theme-snap");
   applyTheme(theme);
   requestAnimationFrame(() => rootEl.classList.remove("theme-snap"));
 
-  const bloom = overlay.animate(
-    { transform: ["scale(0)", "scale(1)"], opacity: [0.85, 0] },
-    { duration: 650, easing: "cubic-bezier(0.22, 1, 0.36, 1)", fill: "forwards" }
+  // read the body's new background now that the theme has swapped
+  flood.style.background = getComputedStyle(document.body).backgroundColor;
+
+  const grow = flood.animate(
+    { clipPath: [`circle(0px at ${o.x}px ${o.y}px)`, `circle(${o.r}px at ${o.x}px ${o.y}px)`] },
+    { duration: 620, easing: "cubic-bezier(0.4, 0, 0.2, 1)", fill: "forwards" }
   );
-  bloom.onfinish = () => overlay.remove();
+  grow.onfinish = () => {
+    keeper.remove();
+    flood.remove();
+  };
 }
+
+// The full snapshot reveal is desktop-only: iOS animates View Transitions
+// at a visibly low frame rate, so touch devices get the compositor-friendly
+// background flood above instead
+const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
 
 function switchTheme(theme, origin) {
   if (reducedMotion) {
@@ -519,10 +540,9 @@ function switchTheme(theme, origin) {
     return;
   }
 
-  // Every device: the new theme sweeps in as a circle from the toggle,
-  // revealing the fully-formed new page (background and content together, so
-  // nothing on screen is ever disrupted or covered by a blank overlay).
-  if (document.startViewTransition && origin) {
+  // Desktop: the new theme sweeps in as a circle revealing the fully-formed
+  // page (View Transitions API)
+  if (!coarsePointer && document.startViewTransition && origin) {
     rootEl.classList.add("theme-snap");
     const vt = document.startViewTransition(() => applyTheme(theme));
     vt.ready
@@ -547,8 +567,8 @@ function switchTheme(theme, origin) {
     return;
   }
 
-  // Browsers without the View Transitions API
-  circleWipe(theme, origin);
+  // Phones, tablets, and browsers without View Transitions
+  backgroundFlood(theme, origin);
 }
 
 // Sync button state with the theme the head script picked before paint
