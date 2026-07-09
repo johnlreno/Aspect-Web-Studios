@@ -456,6 +456,175 @@ confirmBtn.addEventListener("click", () => {
   pickedSlot = null;
 });
 
+// ---------- Section snap: pages click into place when scrolling settles ----------
+// After the visitor stops scrolling (or lifts their finger on touch), the
+// section owning half or more of the screen glides into place, centered.
+// The animation adapts to scroll speed — flicks land quickly, gentle scrolls
+// settle calmly. The live-demo section is exempt so the demo sites can be
+// browsed freely.
+(function () {
+  if (reducedMotion) return;
+
+  const sections = Array.from(document.querySelectorAll("main > section"));
+  const demoSection = document.getElementById("demo");
+  const rootStyle = document.documentElement.style;
+
+  let touchActive = false;
+  let snapping = false;
+  let snapRaf = 0;
+  let settleTimer = null;
+
+  // Rolling scroll speed in px/ms. `velocity` is a smoothed instantaneous
+  // reading; `peakSpeed` decays with a short half-life so a flick still
+  // registers as "fast" once the momentum has died down and we snap.
+  let lastY = window.scrollY;
+  let lastT = performance.now();
+  let velocity = 0;
+  let peakSpeed = 0;
+
+  function trackVelocity() {
+    const now = performance.now();
+    const dt = now - lastT;
+    if (dt > 0 && dt < 200) {
+      const inst = (window.scrollY - lastY) / dt;
+      velocity = velocity * 0.65 + inst * 0.35;
+      peakSpeed = Math.max(Math.abs(inst), peakSpeed * Math.pow(0.5, dt / 180));
+    } else {
+      velocity = 0;
+      peakSpeed = 0;
+    }
+    lastY = window.scrollY;
+    lastT = now;
+  }
+
+  function dominantSection() {
+    const vh = window.innerHeight;
+    let best = null;
+    let bestVisible = 0;
+    for (const section of sections) {
+      const r = section.getBoundingClientRect();
+      const visible = Math.min(r.bottom, vh) - Math.max(r.top, 0);
+      if (visible > bestVisible) {
+        bestVisible = visible;
+        best = section;
+      }
+    }
+    // only snap when one page clearly owns the screen (half or more)…
+    if (!best || bestVisible < vh / 2) return null;
+    // …and never while the demo-website page has the screen
+    if (best === demoSection) return null;
+    return best;
+  }
+
+  function snapTargetFor(section) {
+    const vh = window.innerHeight;
+    const rect = section.getBoundingClientRect();
+    const top = window.scrollY + rect.top;
+    let target;
+    if (rect.height <= vh) {
+      // page fits on screen: center it
+      target = top - (vh - rect.height) / 2;
+    } else {
+      // page taller than the screen: never force scrolling past its edges
+      target = Math.min(Math.max(window.scrollY, top), top + rect.height - vh);
+    }
+    const max = document.documentElement.scrollHeight - vh;
+    return Math.max(0, Math.min(target, max));
+  }
+
+  function cancelSnap() {
+    snapping = false;
+    cancelAnimationFrame(snapRaf);
+    clearTimeout(settleTimer);
+    rootStyle.scrollBehavior = "";
+  }
+
+  function animateSnap(target) {
+    const from = window.scrollY;
+    const distance = target - from;
+    if (Math.abs(distance) < 2) return;
+
+    // Fast scrolls get a shorter trip; slow scrolls a calmer one
+    let duration = 340 + Math.min(Math.abs(distance), window.innerHeight) * 0.4;
+    if (peakSpeed > 2) duration *= 0.5;
+    else if (peakSpeed > 0.8) duration *= 0.72;
+    duration = Math.min(850, Math.max(220, duration));
+
+    // Arriving out of motion: launch quick, land soft — the page already has
+    // momentum. From near-rest: ease in and out so nothing jerks.
+    const ease =
+      peakSpeed > 0.8
+        ? (t) => 1 - Math.pow(1 - t, 4)
+        : (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
+    snapping = true;
+    rootStyle.scrollBehavior = "auto"; // keep CSS smooth-scroll from re-easing our frames
+    const start = performance.now();
+
+    (function step(now) {
+      if (!snapping) return;
+      const t = Math.min((now - start) / duration, 1);
+      window.scrollTo(0, from + distance * ease(t));
+      if (t < 1) {
+        snapRaf = requestAnimationFrame(step);
+      } else {
+        snapping = false;
+        rootStyle.scrollBehavior = "";
+        velocity = 0;
+        peakSpeed = 0;
+        lastY = window.scrollY;
+        lastT = performance.now();
+      }
+    })(start);
+  }
+
+  function queueSnap() {
+    clearTimeout(settleTimer);
+    if (touchActive || snapping) return;
+    settleTimer = setTimeout(() => {
+      if (touchActive || snapping) return;
+      const section = dominantSection();
+      if (section) animateSnap(snapTargetFor(section));
+    }, 120);
+  }
+
+  window.addEventListener(
+    "scroll",
+    () => {
+      if (snapping) return; // ignore our own animation frames
+      trackVelocity();
+      queueSnap();
+    },
+    { passive: true }
+  );
+
+  // While a finger is on the screen the page follows it exactly — no snapping
+  // until release (then momentum runs out, then the settle timer fires)
+  window.addEventListener(
+    "touchstart",
+    () => {
+      touchActive = true;
+      cancelSnap();
+    },
+    { passive: true }
+  );
+  function touchDone(e) {
+    if (e.touches.length === 0) {
+      touchActive = false;
+      queueSnap();
+    }
+  }
+  window.addEventListener("touchend", touchDone, { passive: true });
+  window.addEventListener("touchcancel", touchDone, { passive: true });
+
+  // Fresh input takes control back from a snap already in flight
+  window.addEventListener("wheel", cancelSnap, { passive: true });
+  window.addEventListener("keydown", (e) => {
+    const scrollKeys = ["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " ", "Spacebar"];
+    if (scrollKeys.includes(e.key)) cancelSnap();
+  });
+})();
+
 // ---------- Footer year ----------
 document.getElementById("year").textContent = new Date().getFullYear();
 
