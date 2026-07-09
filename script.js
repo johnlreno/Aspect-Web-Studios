@@ -491,38 +491,32 @@ function radiusFrom(origin) {
   };
 }
 
-// Cheap, always-smooth transition: a single solid overlay wipes across as
-// an expanding circle, we swap the theme while it fully covers the screen
-// (no color pop), then fade the overlay away to reveal the new page. Only
-// clip-path and opacity animate — both run on the compositor, so it stays
-// fluid on phones where the View Transitions snapshot stutters.
+// Cheap, always-smooth transition: the theme snaps in a single frame (rather
+// than letting every element's own color transition ease independently,
+// which passes through a muddy, low-contrast blend where text and
+// background both sit mid-grey) while a soft brand-colored glow blooms
+// outward from the toggle behind the page content for the visual flourish.
+// The glow never covers content — z-index 0, same layer as the ambient
+// blobs — so nothing on the page is ever blocked. Only transform and
+// opacity animate on the glow, both compositor-only, so it stays fluid on
+// phones where the View Transitions snapshot stutters.
 function circleWipe(theme, origin) {
   const o = radiusFrom(origin);
   const overlay = document.createElement("div");
   overlay.className = "theme-wipe";
-  overlay.style.background = theme === "dark" ? "#131316" : "#f6f6f7";
+  overlay.style.left = `${o.x}px`;
+  overlay.style.top = `${o.y}px`;
   document.body.appendChild(overlay);
 
-  const grow = overlay.animate(
-    {
-      clipPath: [`circle(0px at ${o.x}px ${o.y}px)`, `circle(${o.r}px at ${o.x}px ${o.y}px)`],
-    },
-    { duration: 430, easing: "cubic-bezier(0.4, 0, 0.2, 1)", fill: "forwards" }
+  rootEl.classList.add("theme-snap");
+  applyTheme(theme);
+  requestAnimationFrame(() => rootEl.classList.remove("theme-snap"));
+
+  const bloom = overlay.animate(
+    { transform: ["scale(0)", "scale(1)"], opacity: [0.85, 0] },
+    { duration: 650, easing: "cubic-bezier(0.22, 1, 0.36, 1)", fill: "forwards" }
   );
-
-  grow.onfinish = () => {
-    // Screen is fully covered — swap instantly (theme-snap kills the body's
-    // 1.1s background transition so nothing eases underneath the cover)
-    rootEl.classList.add("theme-snap");
-    applyTheme(theme);
-    requestAnimationFrame(() => rootEl.classList.remove("theme-snap"));
-
-    const fade = overlay.animate(
-      { opacity: [1, 0] },
-      { duration: 340, easing: "ease", fill: "forwards" }
-    );
-    fade.onfinish = () => overlay.remove();
-  };
+  bloom.onfinish = () => overlay.remove();
 }
 
 function switchTheme(theme, origin) {

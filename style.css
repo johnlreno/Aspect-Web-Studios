@@ -1847,16 +1847,24 @@ main { position: relative; z-index: 1; }
 ::view-transition-old(root) { z-index: 1; }
 ::view-transition-new(root) { z-index: 9999; }
 
-/* Phones / tablets / no-View-Transitions: a solid overlay wipes across as an
-   expanding circle, then fades to reveal the swapped page. Only clip-path and
-   opacity animate here — both stay on the compositor, so it's smooth on iOS
-   where snapshotting the whole page stutters. */
+/* Phones / tablets / no-View-Transitions: the theme swaps instantly and every
+   themed element eases into its own new colors via its existing CSS
+   transition. This glow is purely decorative — a soft brand-colored bloom
+   from the toggle — and sits behind the page content (z-index 0, same layer
+   as the ambient blobs) so it never covers text or blocks anything. Only
+   transform and opacity animate, so it stays smooth on iOS. */
 .theme-wipe {
   position: fixed;
-  inset: 0;
-  z-index: 70;              /* above the nav (50) and toggle (60) */
+  z-index: 0;
+  width: 65vmax;
+  height: 65vmax;
+  margin-left: -32.5vmax;
+  margin-top: -32.5vmax;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(91, 108, 255, 0.4), rgba(255, 95, 109, 0.28) 45%, transparent 72%);
+  filter: blur(30px);
   pointer-events: none;
-  will-change: clip-path, opacity;
+  will-change: transform, opacity;
 }
 
 /* While the swap happens (View Transitions snapshot, or under the wipe's full
