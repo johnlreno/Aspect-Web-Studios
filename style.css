@@ -1012,7 +1012,11 @@ main { position: relative; z-index: 1; }
 }
 
 /* --- The pencil demo site --- */
-.demo { background: #fffdf7; min-height: 380px; }
+/* Anchor text to the pinned ink so the whole subtree keeps its light-mode
+   look in dark mode — inherited `color` computes to a concrete value at the
+   body, so redefining --ink on .browser alone wouldn't reach text that
+   doesn't explicitly reference it */
+.demo { background: #fffdf7; min-height: 380px; color: var(--ink); }
 
 .demo-banner {
   text-align: center;

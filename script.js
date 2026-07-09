@@ -477,10 +477,6 @@ function applyTheme(theme) {
   if (themeMeta) themeMeta.content = theme === "dark" ? "#131316" : "#f6f6f7";
 }
 
-// Touch devices choke on the View Transitions snapshot; give them the
-// lightweight circle wipe below instead
-const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
-
 function radiusFrom(origin) {
   const ox = origin ? origin.x : window.innerWidth - 38;
   const oy = origin ? origin.y : 36;
@@ -491,15 +487,13 @@ function radiusFrom(origin) {
   };
 }
 
-// Cheap, always-smooth transition: the theme snaps in a single frame (rather
-// than letting every element's own color transition ease independently,
-// which passes through a muddy, low-contrast blend where text and
-// background both sit mid-grey) while a soft brand-colored glow blooms
-// outward from the toggle behind the page content for the visual flourish.
-// The glow never covers content — z-index 0, same layer as the ambient
-// blobs — so nothing on the page is ever blocked. Only transform and
-// opacity animate on the glow, both compositor-only, so it stays fluid on
-// phones where the View Transitions snapshot stutters.
+// Fallback for browsers without the View Transitions API: the theme snaps in
+// a single frame (rather than letting every element's own color transition
+// ease independently, which passes through a muddy, low-contrast blend where
+// text and background both sit mid-grey) while a soft brand-colored glow
+// blooms outward from the toggle behind the page content for the visual
+// flourish. The glow never covers content — z-index 0, same layer as the
+// ambient blobs — so nothing on the page is ever blocked.
 function circleWipe(theme, origin) {
   const o = radiusFrom(origin);
   const overlay = document.createElement("div");
@@ -525,9 +519,10 @@ function switchTheme(theme, origin) {
     return;
   }
 
-  // Desktop: the new theme sweeps in as a circle revealing the fully-formed
-  // page (View Transitions API)
-  if (!coarsePointer && document.startViewTransition && origin) {
+  // Every device: the new theme sweeps in as a circle from the toggle,
+  // revealing the fully-formed new page (background and content together, so
+  // nothing on screen is ever disrupted or covered by a blank overlay).
+  if (document.startViewTransition && origin) {
     rootEl.classList.add("theme-snap");
     const vt = document.startViewTransition(() => applyTheme(theme));
     vt.ready
@@ -552,7 +547,7 @@ function switchTheme(theme, origin) {
     return;
   }
 
-  // Phones, tablets, and browsers without View Transitions
+  // Browsers without the View Transitions API
   circleWipe(theme, origin);
 }
 
