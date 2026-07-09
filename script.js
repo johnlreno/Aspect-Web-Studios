@@ -147,6 +147,107 @@ window.addEventListener("resize", () => {
   navPill.style.transition = "";
 });
 
+// ---------- Nav collapse: hide the whole box down to a glowing bubble ----------
+const siteNav = document.getElementById("site-nav");
+const navContent = document.getElementById("nav-content");
+const navClose = document.getElementById("nav-close");
+const navOrb = document.getElementById("nav-orb");
+let navCollapsed = false;
+
+function bubbleSize() {
+  return window.matchMedia("(max-width: 640px)").matches ? 44 : 46;
+}
+
+function collapseNav() {
+  if (navCollapsed) return;
+  navCollapsed = true;
+
+  navContent.setAttribute("aria-hidden", "true");
+  navContent.querySelectorAll("a, button").forEach((el) => el.setAttribute("tabindex", "-1"));
+  navOrb.removeAttribute("tabindex");
+
+  if (reducedMotion) {
+    siteNav.classList.add("is-collapsed");
+    document.body.classList.add("nav-is-collapsed");
+    return;
+  }
+
+  // lock in the current (expanded) box size, then swap to the collapsed
+  // padding/background instantly so it doesn't race the width/height animation
+  const rect = siteNav.getBoundingClientRect();
+  siteNav.style.width = `${rect.width}px`;
+  siteNav.style.height = `${rect.height}px`;
+  void siteNav.offsetWidth;
+  siteNav.classList.add("is-collapsed");
+  document.body.classList.add("nav-is-collapsed");
+
+  const size = bubbleSize();
+  requestAnimationFrame(() => {
+    siteNav.style.width = `${size}px`;
+    siteNav.style.height = `${size}px`;
+  });
+}
+
+function expandNav() {
+  if (!navCollapsed) return;
+  navCollapsed = false;
+
+  navContent.removeAttribute("aria-hidden");
+  navContent.querySelectorAll("a, button").forEach((el) => el.removeAttribute("tabindex"));
+  navOrb.setAttribute("tabindex", "-1");
+
+  if (reducedMotion) {
+    siteNav.classList.remove("is-collapsed");
+    document.body.classList.remove("nav-is-collapsed");
+    siteNav.style.width = "";
+    siteNav.style.height = "";
+    return;
+  }
+
+  // drop the collapsed padding/background instantly, measure the true
+  // natural size that results, then snap back to the bubble and animate up
+  siteNav.classList.remove("is-collapsed");
+  document.body.classList.remove("nav-is-collapsed");
+  siteNav.style.width = "";
+  siteNav.style.height = "";
+  const target = siteNav.getBoundingClientRect();
+
+  const size = bubbleSize();
+  siteNav.style.width = `${size}px`;
+  siteNav.style.height = `${size}px`;
+  void siteNav.offsetWidth;
+
+  requestAnimationFrame(() => {
+    siteNav.style.width = `${target.width}px`;
+    siteNav.style.height = `${target.height}px`;
+  });
+
+  siteNav.addEventListener(
+    "transitionend",
+    () => {
+      if (!navCollapsed) {
+        siteNav.style.width = "";
+        siteNav.style.height = "";
+      }
+    },
+    { once: true }
+  );
+}
+
+navClose.addEventListener("click", collapseNav);
+navOrb.addEventListener("click", expandNav);
+
+// keep the collapsed bubble sized correctly if the viewport changes breakpoint
+window.addEventListener("resize", () => {
+  if (!navCollapsed) return;
+  const size = bubbleSize();
+  siteNav.style.transition = "none";
+  siteNav.style.width = `${size}px`;
+  siteNav.style.height = `${size}px`;
+  void siteNav.offsetWidth;
+  siteNav.style.transition = "";
+});
+
 // ---------- Background tone + nav bubble, driven by scroll position ----------
 // (scroll-position based rather than IntersectionObserver: thresholds can
 // never fire for sections taller than the viewport)

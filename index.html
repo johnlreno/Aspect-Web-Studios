@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=7" />
+  <link rel="stylesheet" href="style.css?v=8" />
 </head>
 <body>
 
@@ -35,20 +35,29 @@
   </div>
 
   <!-- ============ NAV ============ -->
-  <header class="nav">
-    <a class="nav-logo" href="#top">
-      <span class="logo-mark"></span>
-      Aspect<span class="logo-thin">Web Studios</span>
-    </a>
-    <span class="nav-divider" aria-hidden="true"></span>
-    <nav class="nav-links">
-      <span class="nav-pill" aria-hidden="true"></span>
-      <a href="#work">Work</a>
-      <a href="#services">Services</a>
-      <a href="#demo">Demo</a>
-      <a href="#about">About</a>
-      <a class="nav-cta" href="#contact">Start a project</a>
-    </nav>
+  <header class="nav" id="site-nav">
+    <div class="nav-content" id="nav-content">
+      <a class="nav-logo" href="#top">
+        <span class="logo-mark"></span>
+        Aspect<span class="logo-thin">Web Studios</span>
+      </a>
+      <span class="nav-divider" aria-hidden="true"></span>
+      <nav class="nav-links">
+        <span class="nav-pill" aria-hidden="true"></span>
+        <a href="#work">Work</a>
+        <a href="#services">Services</a>
+        <a href="#demo">Demo</a>
+        <a href="#about">About</a>
+        <a class="nav-cta" href="#contact">Start a project</a>
+      </nav>
+      <button class="nav-close" id="nav-close" type="button" aria-label="Hide navigation">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
+    <button class="nav-orb" id="nav-orb" type="button" aria-label="Show navigation" tabindex="-1"></button>
   </header>
 
   <!-- Light / dark switch -->
@@ -485,7 +494,7 @@
     <span class="footer-fine">Website designed &amp; built in-house — of course.</span>
   </footer>
 
-  <script src="script.js?v=7"></script>
+  <script src="script.js?v=8"></script>
   <script>
     window.formspree = window.formspree || function () { (formspree.q = formspree.q || []).push(arguments); };
     formspree('initForm', { formElement: '#contact-form', formId: 'xrewwppv' });
