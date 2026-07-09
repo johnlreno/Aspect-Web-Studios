@@ -935,8 +935,25 @@ main { position: relative; z-index: 1; }
 
 .demo-link.is-active { background: var(--ink); color: #fff; }
 
+/* Fixed-height viewport so the frame never jumps size between panels or
+   when interacting (cart, etc.); taller content scrolls inside */
 .demo-panel { display: none; animation: panel-in 0.5s var(--ease); }
-.demo-panel.is-active { display: block; }
+.demo-panel.is-active {
+  display: block;
+  height: 500px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Slim, unobtrusive scrollbars inside the demo frames */
+.demo-panel.is-active, .demo2-panel.is-active { scrollbar-width: thin; }
+.demo-panel.is-active::-webkit-scrollbar, .demo2-panel.is-active::-webkit-scrollbar { width: 6px; }
+.demo-panel.is-active::-webkit-scrollbar-thumb {
+  background: rgba(28, 28, 30, 0.16); border-radius: 6px;
+}
+.demo2-panel.is-active::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18); border-radius: 6px;
+}
 
 @keyframes panel-in {
   from { opacity: 0; transform: translateY(12px); }
@@ -1257,6 +1274,11 @@ main { position: relative; z-index: 1; }
   .demo-news { flex-wrap: nowrap; width: 100%; }
   .demo-news input { flex: 1; min-width: 0; }
   .demo-news button { flex-shrink: 0; white-space: nowrap; padding: 9px 13px; }
+
+  /* Keep the demo frame a phone-friendly height instead of stretching tall
+     as the content reflows; taller panels scroll inside */
+  .demo-panel.is-active { height: 460px; }
+  .demo2-panel.is-active { height: 440px; }
 }
 
 /* ============ Demo 2: Iron & Oak (dark, bold, clean) ============ */
@@ -1337,7 +1359,12 @@ main { position: relative; z-index: 1; }
 .demo2-link.is-active { background: #8fb8da; color: #28313f; }
 
 .demo2-panel { display: none; animation: panel-in 0.5s var(--ease); }
-.demo2-panel.is-active { display: block; }
+.demo2-panel.is-active {
+  display: block;
+  height: 470px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
 
 .demo2-hero { padding: 52px 40px 30px; }
 
@@ -1477,38 +1504,39 @@ main { position: relative; z-index: 1; }
 
 .demo2-note { margin-top: 16px; font-size: 0.88rem; font-weight: 600; color: #8fb8da; min-height: 1.4em; }
 
-/* ============ Placeholder / experiment areas ============ */
-.placeholder-tag {
-  display: inline-block;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--accent-1);
-  background: rgba(91, 108, 255, 0.1);
-  padding: 4px 10px;
-  border-radius: 999px;
-  margin-bottom: 14px;
-}
-
-.placeholder {
-  border: 1.5px dashed rgba(91, 108, 255, 0.4);
+/* ============ About card ============ */
+.about-card {
+  border: 1px solid var(--line);
   border-radius: var(--radius);
-  padding: 28px;
+  padding: 30px 32px;
   background: var(--surface);
-  color: var(--ink-soft);
-  cursor: text;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  max-width: 680px;
 }
 
-.placeholder:hover { border-color: var(--accent-1); }
+.about-card p {
+  color: var(--ink-soft);
+  font-size: 1rem;
+  line-height: 1.7;
+}
 
-.placeholder p[contenteditable="true"] {
-  outline: none;
+.about-cta {
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  font-style: italic;
   color: var(--ink);
 }
 
-.placeholder.is-editing { box-shadow: 0 0 0 4px rgba(91, 108, 255, 0.12); border-style: solid; }
+.about-cta a {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--accent-1);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(91, 108, 255, 0.35);
+  transition: border-color 0.25s ease;
+}
+
+.about-cta a:hover { border-color: var(--accent-1); }
 
 /* ============ Contact form ============ */
 .contact {

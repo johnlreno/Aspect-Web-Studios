@@ -343,20 +343,6 @@ confirmBtn.addEventListener("click", () => {
   pickedSlot = null;
 });
 
-// ---------- Editable placeholder (experiment area) ----------
-document.querySelectorAll("[data-placeholder]").forEach((box) => {
-  const text = box.querySelector("p");
-  box.addEventListener("click", () => {
-    text.setAttribute("contenteditable", "true");
-    box.classList.add("is-editing");
-    text.focus();
-  });
-  text.addEventListener("blur", () => {
-    text.removeAttribute("contenteditable");
-    box.classList.remove("is-editing");
-  });
-});
-
 // ---------- Footer year ----------
 document.getElementById("year").textContent = new Date().getFullYear();
 
