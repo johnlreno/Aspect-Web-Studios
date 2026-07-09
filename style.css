@@ -1736,6 +1736,9 @@ main { position: relative; z-index: 1; }
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--ink-soft);
+  text-decoration: none;
+  width: fit-content;
+  transition: color 0.25s ease;
 }
 
 .social-icon {
@@ -1745,15 +1748,19 @@ main { position: relative; z-index: 1; }
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  color: var(--ink-soft);
+  color: inherit;
   transition: color 0.25s ease, transform 0.25s ease;
 }
 
 .social-icon svg { width: 22px; height: 22px; }
 
-.social-icon:hover,
-.social-icon:focus-visible {
+.social-line:hover,
+.social-line:focus-visible {
   color: #1877f2;
+}
+
+.social-line:hover .social-icon,
+.social-line:focus-visible .social-icon {
   transform: translateY(-2px) scale(1.08);
 }
 
