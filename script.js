@@ -172,11 +172,13 @@ function collapseNav() {
     return;
   }
 
-  // lock in the current (expanded) box size, then swap to the collapsed
-  // padding/background instantly so it doesn't race the width/height animation
+  // lock in the current (expanded) box size, and pin the content to its
+  // natural pixel width so the links don't reflow/squish as the box shrinks
   const rect = siteNav.getBoundingClientRect();
+  const contentWidth = navContent.getBoundingClientRect().width;
   siteNav.style.width = `${rect.width}px`;
   siteNav.style.height = `${rect.height}px`;
+  navContent.style.width = `${contentWidth}px`;
   void siteNav.offsetWidth;
   siteNav.classList.add("is-collapsed");
   document.body.classList.add("nav-is-collapsed");
@@ -201,37 +203,46 @@ function expandNav() {
     document.body.classList.remove("nav-is-collapsed");
     siteNav.style.width = "";
     siteNav.style.height = "";
+    navContent.style.width = "";
     return;
   }
 
-  // drop the collapsed padding/background instantly, measure the true
-  // natural size that results, then snap back to the bubble and animate up
+  // Measure the natural size with transitions off (the nav has a CSS width
+  // on phones, so clearing the inline width would otherwise *animate* toward
+  // it and the measurement would read the still-tiny box), then snap back to
+  // the bubble size and animate up to the target in the same frame.
   siteNav.classList.remove("is-collapsed");
   document.body.classList.remove("nav-is-collapsed");
+  siteNav.style.transition = "none";
   siteNav.style.width = "";
   siteNav.style.height = "";
+  navContent.style.width = "";
   const target = siteNav.getBoundingClientRect();
+  const contentWidth = navContent.getBoundingClientRect().width;
+
+  // pin the content at its final width so it keeps its finished layout
+  // (instead of squishing vertically) while the box grows around it
+  navContent.style.width = `${contentWidth}px`;
 
   const size = bubbleSize();
   siteNav.style.width = `${size}px`;
   siteNav.style.height = `${size}px`;
-  void siteNav.offsetWidth;
+  void siteNav.offsetWidth; // commit the bubble-sized start state, unanimated
 
-  requestAnimationFrame(() => {
-    siteNav.style.width = `${target.width}px`;
-    siteNav.style.height = `${target.height}px`;
+  siteNav.style.transition = "";
+  siteNav.style.width = `${target.width}px`;
+  siteNav.style.height = `${target.height}px`;
+
+  siteNav.addEventListener("transitionend", function cleanUp(e) {
+    // child fades (orb, content) bubble up here too — wait for the box itself
+    if (e.target !== siteNav || e.propertyName !== "width") return;
+    siteNav.removeEventListener("transitionend", cleanUp);
+    if (!navCollapsed) {
+      siteNav.style.width = "";
+      siteNav.style.height = "";
+      navContent.style.width = "";
+    }
   });
-
-  siteNav.addEventListener(
-    "transitionend",
-    () => {
-      if (!navCollapsed) {
-        siteNav.style.width = "";
-        siteNav.style.height = "";
-      }
-    },
-    { once: true }
-  );
 }
 
 navClose.addEventListener("click", collapseNav);
@@ -283,6 +294,7 @@ updateSectionState();
 const easeOut = (t) => 1 - Math.pow(1 - t, 3);
 
 function countUp(el) {
+  if (!el.dataset.count) return; // static symbols (like the $ card) don't count
   const target = parseInt(el.dataset.count, 10);
   const duration = 1400;
   const start = performance.now();
@@ -312,7 +324,7 @@ document.querySelectorAll(".stat-num").forEach((el) => statObserver.observe(el))
 // ---------- Stat cards: tap to learn more ----------
 const statNotes = {
   1: "Most projects go from first call to launch in about two weeks.",
-  2: "Fast sites rank higher and convert better — every build is tuned for speed.",
+  2: "Premium, custom design at a fair, negotiable price — never thousands for a cookie-cutter template.",
   3: "You work directly with the person building your site — no handoffs.",
 };
 

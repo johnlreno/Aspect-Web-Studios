@@ -147,7 +147,10 @@ body.tone-e { background-color: var(--tone-e); }
   align-items: center;
   gap: 28px;
   padding-right: 26px;
-  transition: opacity 0.25s ease;
+  flex-shrink: 0; /* keep the finished layout while the box resizes around it */
+  /* fade in only near the end of the box's grow animation, so the links
+     never show mid-resize */
+  transition: opacity 0.3s ease 0.28s;
 }
 
 .nav.is-collapsed {
@@ -160,6 +163,7 @@ body.tone-e { background-color: var(--tone-e); }
 .nav.is-collapsed .nav-content {
   opacity: 0;
   pointer-events: none;
+  transition: opacity 0.2s ease; /* fade out right away when collapsing */
 }
 
 /* Small x that hides the nav down to the glowing bubble */
@@ -207,13 +211,16 @@ body.tone-e { background-color: var(--tone-e); }
   opacity: 0;
   transform: scale(0.35);
   pointer-events: none;
-  transition: opacity 0.3s ease 0.12s, transform 0.4s var(--ease) 0.12s;
+  /* vanish immediately when the box reopens so it never lingers mid-animation */
+  transition: opacity 0.1s ease, transform 0.15s var(--ease);
 }
 
 .nav.is-collapsed .nav-orb {
   opacity: 1;
   transform: scale(1);
   pointer-events: auto;
+  /* appear slightly after the box has shrunk down when collapsing */
+  transition: opacity 0.3s ease 0.12s, transform 0.4s var(--ease) 0.12s;
   animation: orb-glow 2.4s ease-in-out infinite, orb-float 3.6s ease-in-out infinite;
 }
 
@@ -1658,6 +1665,23 @@ main { position: relative; z-index: 1; }
 .about-cta a:hover { border-color: var(--accent-1); }
 
 /* ============ Contact form ============ */
+.contact-intro {
+  color: var(--ink);
+  font-size: 1.02rem;
+  max-width: 620px;
+  margin: -8px 0 26px;
+}
+
+.contact-intro a {
+  font-weight: 600;
+  color: var(--accent-1);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(91, 108, 255, 0.35);
+  transition: border-color 0.25s ease;
+}
+
+.contact-intro a:hover { border-color: var(--accent-1); }
+
 .contact {
   background: var(--surface);
   border: 1px solid var(--line);
